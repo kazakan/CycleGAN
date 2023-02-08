@@ -61,5 +61,12 @@ if __name__ == "__main__":
 
     parser.add_argument("--verbose", type=int, default=20)
 
+    parser.add_argument(
+        "--cuda",
+        default=False,
+        action="store_true",
+        help="Use cuda or not",
+    )
+
     args = parser.parse_args()
     train(args)
