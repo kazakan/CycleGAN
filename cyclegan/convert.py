@@ -13,7 +13,7 @@ def main(args):
     cuda = args.cuda
     dev = "cpu" if cuda else "cuda"
 
-    model = torch.load(args.model, map)
+    model = torch.load(args.model)
 
     model.to(dev)
     model.eval()
