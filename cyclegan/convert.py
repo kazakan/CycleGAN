@@ -13,8 +13,8 @@ def main(args):
     cuda = args.cuda
     dev = "cpu" if cuda else "cuda"
 
-    model = torch.load(args.model,map)
-    
+    model = torch.load(args.model, map)
+
     model.to(dev)
     model.eval()
 
@@ -24,14 +24,13 @@ def main(args):
     toimage = T.ToPILImage()
     imgs = []
 
-    
     with torch.no_grad():
         for idx, img in tqdm(
             enumerate(dataloader), desc="Processing", total=len(dataloader)
         ):
             if cuda:
                 img = img.cuda()
-                
+
             converted_img = model(img)
             converted_img = converted_img.detach().cpu()
             converted_img = converted_img.squeeze()
