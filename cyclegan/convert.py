@@ -10,7 +10,12 @@ from cyclegan.dataset.img_folder import ImageFolder
 
 
 def main(args):
-    model = torch.load(args.model)
+    cuda = args.cuda
+    dev = "cpu" if cuda else "cuda"
+
+    model = torch.load(args.model,map)
+    
+    model.to(dev)
     model.eval()
 
     dataset = ImageFolder(args.source, transform=T.ToTensor())
@@ -19,10 +24,14 @@ def main(args):
     toimage = T.ToPILImage()
     imgs = []
 
+    
     with torch.no_grad():
         for idx, img in tqdm(
             enumerate(dataloader), desc="Processing", total=len(dataloader)
         ):
+            if cuda:
+                img = img.cuda()
+                
             converted_img = model(img)
             converted_img = converted_img.detach().cpu()
             converted_img = converted_img.squeeze()
@@ -38,6 +47,13 @@ if __name__ == "__main__":
     parser.add_argument("model", type=Path)
     parser.add_argument("source", type=Path)
     parser.add_argument("dest", type=Path)
+
+    parser.add_argument(
+        "--cuda",
+        default=False,
+        action="store_true",
+        help="Use cuda or not",
+    )
 
     args = parser.parse_args()
     main(args)
