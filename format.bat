@@ -1,3 +1,3 @@
-ruff bsrecog --fix
-black bsrecog
-isort bsrecog
+ruff cyclegan --fix
+black cyclegan
+isort cyclegan
