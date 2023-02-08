@@ -11,7 +11,7 @@ from cyclegan.dataset.img_folder import ImageFolder
 
 def main(args):
     cuda = args.cuda
-    dev = "cpu" if cuda else "cuda"
+    dev = "cuda" if cuda else "cpu"
 
     model = torch.load(args.model)
 
