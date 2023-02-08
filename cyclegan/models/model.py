@@ -156,8 +156,9 @@ class CycleGANMethod:
                 self.D_B.requires_grad_ = False
                 self.optim_G.zero_grad()
 
-                real_A.to(self.dev)
-                real_B.to(self.dev)
+                if self.cuda:
+                    real_A = real_A.cuda()
+                    real_B = real_B.cuda()
 
                 with torch.autocast(self.dev):
                     self.fakes_B = self.G_A(real_A)
