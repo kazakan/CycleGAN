@@ -169,8 +169,8 @@ class CycleGANMethod:
             ):
                 self.D_A.eval()
                 self.D_B.eval()
-                self.D_A.requires_grad_ = False
-                self.D_B.requires_grad_ = False
+                self.D_A.requires_grad_(False)
+                self.D_B.requires_grad_(False)
                 self.optim_G.zero_grad()
 
                 if self.cuda:
@@ -203,8 +203,8 @@ class CycleGANMethod:
                 # optimize discriminators
                 self.D_A.train()
                 self.D_B.train()
-                self.D_A.requires_grad_ = True
-                self.D_B.requires_grad_ = True
+                self.D_A.requires_grad_(True)
+                self.D_B.requires_grad_(True)
                 self.optim_D.zero_grad()
 
                 with torch.autocast(self.dev):
