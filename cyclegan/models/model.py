@@ -113,7 +113,16 @@ class CycleGANMethod:
         self.lr_sched_D = torch.optim.lr_scheduler.StepLR(self.optim_D, 100, 0.8)
 
         # train data
-        transforms = T.Compose([T.Resize((self.img_size, self.img_size)), T.ToTensor()])
+        transforms = T.Compose(
+            [
+                T.Resize((self.img_size + 30, self.img_size + 30)),
+                T.RandomCrop((self.img_size, self.img_size)),
+                T.RandomVerticalFlip(),
+                T.RandomHorizontalFlip(),
+                T.RandomRotation(90),
+                T.ToTensor(),
+            ]
+        )
         self.train_dataset = UnpairedImageDataset(
             Path(root1), Path(root2), transform=transforms
         )
