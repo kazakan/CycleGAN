@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 from typing import Optional
 
+
 import torch
 import torchvision.transforms.transforms as T
 from torch.utils.data import DataLoader
@@ -12,6 +13,8 @@ from cyclegan.dataset.img_folder import UnpairedImageDataset
 from cyclegan.models.loss import (CycleGANDiscriminatorLoss,
                                   CycleGANGeneratorLoss)
 from cyclegan.models.units import Discriminator, Generator
+from cyclegan.utils.logger import CsvLogger, SimpleLogger
+from cyclegan.utils.meter import MultiAverageMeter
 
 
 class CycleGANMethod:
@@ -36,12 +39,20 @@ class CycleGANMethod:
         save_ckpt_interval: int = 10,
         path_ckpt: Optional[os.PathLike] = None,
         cuda: bool = False,
-        verbose: int = 20,
+        verbose: int = -1,
     ):
         self.save_ckpt_interval = save_ckpt_interval
         self.save_ckpt_dir = Path(save_ckpt_dir)
         self.cuda = cuda
         self.dev = "cuda" if cuda else "cpu"
+
+        if not self.save_ckpt_dir.exists():
+            self.save_ckpt_dir.mkdir()
+
+        self.verbose = verbose if verbose > 0 else save_ckpt_interval
+        self.logcols = ["epoch","loss_G","loss_D_A","loss_D_B"]
+        self.csvlogger = CsvLogger(self.logcols,self.save_ckpt_dir / "history.csv")
+        self.stringlogger = SimpleLogger(self.logcols)
 
         if path_ckpt is None:
             self.in_channels = in_channels
@@ -143,7 +154,11 @@ class CycleGANMethod:
         else:
             self.save_ckpt_dir.mkdir()
 
-        for epoch in tqdm(range(self.cur_epoch, self.max_epochs), desc="Epoch"):
+        avgmeter = MultiAverageMeter(self.logcols[1:])
+
+        pbar_epoch = tqdm(range(self.cur_epoch, self.max_epochs),desc=self.stringlogger.write({"epoch":0}))
+        for epoch in pbar_epoch:
+            avgmeter.reset()
             # forward
             self.cur_epoch = epoch
 
@@ -204,9 +219,26 @@ class CycleGANMethod:
                 loss_D_B.backward()
                 self.optim_D.step()
 
+                losses = {
+                    "loss_G" : loss_G.detach().cpu().item(),
+                    "loss_D_A" : loss_D_A.detach().cpu().item(),
+                    "loss_D_B" : loss_D_B.detach().cpu().item(),
+                }
+                avgmeter.update(losses)
+
             # step lr
             self.lr_sched_G.step()
             self.lr_sched_D.step()
+
+            # log
+            vals = avgmeter.avgs()
+            vals["epoch"] = epoch
+
+            pbar_epoch.set_description(self.stringlogger.write(vals))
+
+            if(((epoch + 1) % self.verbose) == 0) or (
+                epoch + 1 in [1,self.max_epochs]):    
+                self.csvlogger.write(vals)
 
             # save checkpoint
             if (((epoch + 1) % self.save_ckpt_interval) == 0) or (
