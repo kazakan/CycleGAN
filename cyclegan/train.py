@@ -25,7 +25,7 @@ def train(args):
         save_ckpt_interval=args.save_ckpt_interval,
         save_ckpt_dir=args.save_ckpt_dir,
         path_ckpt=args.load_path_ckpt,
-        cuda=args.cuda
+        cuda=args.cuda,
     )
 
     trainer.train()

@@ -1,14 +1,16 @@
 from pathlib import Path
 
+
 class BaseLogger:
     def __init__(self):
         pass
 
-    def write(self,values : dict):
+    def write(self, values: dict):
         raise NotImplementedError()
 
+
 class SimpleLogger(BaseLogger):
-    def __init__(self,column_names,formats = {}):
+    def __init__(self, column_names, formats={}):
         super().__init__()
         self.column_names = column_names
         self.formats = formats
@@ -24,40 +26,41 @@ class SimpleLogger(BaseLogger):
                     formatstr = self.formats[cname]
                 else:
                     _type = type(values[cname])
-                    if _type is float :
+                    if _type is float:
                         formatstr = ".6f"
-                
+
                 # append column data to row
-                s += ("{:"+formatstr+"} | ").format(values[cname])
-            else :
+                s += ("{:" + formatstr + "} | ").format(values[cname])
+            else:
                 s += "? | "
 
             content += s
         return content
 
+
 class ConsoleLogger(SimpleLogger):
-    def __init__(self,column_names,formats = {}):
-        super().__init__(self,column_names,formats)
+    def __init__(self, column_names, formats={}):
+        super().__init__(self, column_names, formats)
 
     def write(self, values: dict):
         content = super().write(values)
         print(content)
         return content
 
+
 class CsvLogger(BaseLogger):
-    def __init__(self, column_names,csv_path,writemode="w"):
+    def __init__(self, column_names, csv_path, writemode="w"):
         super().__init__()
         self.column_names = column_names
         self.csv_path = Path(csv_path)
         self.writemode = writemode
 
         assert not self.csv_path.is_dir()
-            
-        with open(self.csv_path,self.writemode) as f:
-            header = ','.join(column_names)
-            f.write(header+"\n")
 
-        
+        with open(self.csv_path, self.writemode) as f:
+            header = ",".join(column_names)
+            f.write(header + "\n")
+
     def write(self, values: dict):
         content = ""
         for cname in self.column_names:
@@ -67,31 +70,25 @@ class CsvLogger(BaseLogger):
                 content += ","
         content = content[:-1] + "\n"
 
-        with open(self.csv_path,'a') as f:
+        with open(self.csv_path, "a") as f:
             f.write(content)
 
+
 if __name__ == "__main__":
-    cols = ["epochs","train_loss","val_loss","val_metric"]
-    
+    cols = ["epochs", "train_loss", "val_loss", "val_metric"]
+
     consoleLogger = ConsoleLogger(cols)
-    csvLogger = CsvLogger(cols,"./tmp/history.csv",'w')
+    csvLogger = CsvLogger(cols, "./tmp/history.csv", "w")
 
-    vals={
-        "epochs" : 10,
-        "train_loss" : 1000.6,
-        "val_loss" : 2030301.4,
-        "val_metric" : 0.243324
+    vals = {
+        "epochs": 10,
+        "train_loss": 1000.6,
+        "val_loss": 2030301.4,
+        "val_metric": 0.243324,
     }
     consoleLogger.write(vals)
     csvLogger.write(vals)
 
-    vals={
-        "epochs" : 20,
-        "train_loss" : 10,
-        "val_loss" : 5,
-        "val_metric" : 0.8
-    }
+    vals = {"epochs": 20, "train_loss": 10, "val_loss": 5, "val_metric": 0.8}
     consoleLogger.write(vals)
     csvLogger.write(vals)
-
-    

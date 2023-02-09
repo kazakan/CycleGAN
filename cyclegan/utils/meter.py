@@ -1,6 +1,4 @@
-
-class AverageMeter():
-    
+class AverageMeter:
     def __init__(self):
         self.reset()
 
@@ -16,24 +14,25 @@ class AverageMeter():
         self.count += n
         self.avg = self.sum / self.count
 
-class MultiAverageMeter():
-    def __init__(self,names):
+
+class MultiAverageMeter:
+    def __init__(self, names):
         self.names = names
         self._counters = {}
         for n in names:
             self._counters[n] = AverageMeter()
 
-    def __getitem__(self,key):
+    def __getitem__(self, key):
         if key not in self.names:
             raise KeyError()
-        
+
         return self._counters[key]
 
-    def update(self,val):
+    def update(self, val):
         if type(val) is not dict:
             raise ValueError("val should be dictionary")
 
-        for k,v in val.items():
+        for k, v in val.items():
             if k in self.names:
                 self[k].update(v)
 
@@ -46,4 +45,3 @@ class MultiAverageMeter():
         for n in self.names:
             ret[n] = self._counters[n].avg
         return ret
-        

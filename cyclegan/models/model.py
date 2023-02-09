@@ -3,7 +3,6 @@ import os
 from pathlib import Path
 from typing import Optional
 
-
 import torch
 import torchvision.transforms.transforms as T
 from torch.utils.data import DataLoader
@@ -50,8 +49,8 @@ class CycleGANMethod:
             self.save_ckpt_dir.mkdir()
 
         self.verbose = verbose if verbose > 0 else save_ckpt_interval
-        self.logcols = ["epoch","loss_G","loss_D_A","loss_D_B"]
-        self.csvlogger = CsvLogger(self.logcols,self.save_ckpt_dir / "history.csv")
+        self.logcols = ["epoch", "loss_G", "loss_D_A", "loss_D_B"]
+        self.csvlogger = CsvLogger(self.logcols, self.save_ckpt_dir / "history.csv")
         self.stringlogger = SimpleLogger(self.logcols)
 
         if path_ckpt is None:
@@ -156,7 +155,10 @@ class CycleGANMethod:
 
         avgmeter = MultiAverageMeter(self.logcols[1:])
 
-        pbar_epoch = tqdm(range(self.cur_epoch, self.max_epochs),desc=self.stringlogger.write({"epoch":0}))
+        pbar_epoch = tqdm(
+            range(self.cur_epoch, self.max_epochs),
+            desc=self.stringlogger.write({"epoch": 0}),
+        )
         for epoch in pbar_epoch:
             avgmeter.reset()
             # forward
@@ -220,9 +222,9 @@ class CycleGANMethod:
                 self.optim_D.step()
 
                 losses = {
-                    "loss_G" : loss_G.detach().cpu().item(),
-                    "loss_D_A" : loss_D_A.detach().cpu().item(),
-                    "loss_D_B" : loss_D_B.detach().cpu().item(),
+                    "loss_G": loss_G.detach().cpu().item(),
+                    "loss_D_A": loss_D_A.detach().cpu().item(),
+                    "loss_D_B": loss_D_B.detach().cpu().item(),
                 }
                 avgmeter.update(losses)
 
@@ -236,8 +238,9 @@ class CycleGANMethod:
 
             pbar_epoch.set_description(self.stringlogger.write(vals))
 
-            if(((epoch + 1) % self.verbose) == 0) or (
-                epoch + 1 in [1,self.max_epochs]):    
+            if (((epoch + 1) % self.verbose) == 0) or (
+                epoch + 1 in [1, self.max_epochs]
+            ):
                 self.csvlogger.write(vals)
 
             # save checkpoint
