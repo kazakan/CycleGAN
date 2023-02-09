@@ -40,4 +40,10 @@ class MultiAverageMeter():
     def reset(self):
         for n in self.names:
             self._counters[n].reset()
+
+    def avgs(self):
+        ret = {}
+        for n in self.names:
+            ret[n] = self._counters[n].avg
+        return ret
         
