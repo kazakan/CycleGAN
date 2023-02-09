@@ -43,11 +43,11 @@ if __name__ == "__main__":
     parser.add_argument("--out-channels", type=int, default=3)
     parser.add_argument("--hidden", type=int, default=64)
 
-    parser.add_argument("--n-blocks", type=int, default=3)
+    parser.add_argument("--n-blocks", type=int, default=6)
     parser.add_argument("--n-layers", type=int, default=3)
 
     parser.add_argument("--lr", type=float, default=2e-4)
-    parser.add_argument("--b1", type=float, default=0.1)
+    parser.add_argument("--b1", type=float, default=0.5)
 
     parser.add_argument("--img-size", type=int, default=256)
     parser.add_argument("--batch-size", type=int, default=64)
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     parser.add_argument("--lambda2", type=float, default=10.0)
     parser.add_argument("--lambdaI", type=float, default=0.5)
 
-    parser.add_argument("--max-epochs", type=int, default=500)
+    parser.add_argument("--max-epochs", type=int, default=400)
     parser.add_argument("--save-ckpt-interval", type=int, default=50)
     parser.add_argument("--load-path-ckpt", type=Path, default=None)
 
