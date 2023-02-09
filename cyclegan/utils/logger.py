@@ -7,6 +7,34 @@ class BaseLogger:
     def write(self,values : dict):
         raise NotImplementedError()
 
+class SimpleLogger(BaseLogger):
+    def __init__(self,column_names,formats = {}):
+        super().__init__()
+        self.column_names = column_names
+        self.formats = formats
+
+    def write(self, values: dict):
+        content = ""
+        for cname in self.column_names:
+            s = f"{cname} : "
+            if cname in values:
+                # decide format str
+                formatstr = ""
+                if cname in self.formats:
+                    formatstr = self.formats[cname]
+                else:
+                    _type = type(values[cname])
+                    if _type is float :
+                        formatstr = ".6f"
+                
+                # append column data to row
+                s += ("{:"+formatstr+"} | ").format(values[cname])
+            else :
+                s += "? | "
+
+            content += s
+        return content
+
 class ConsoleLogger(BaseLogger):
     def __init__(self,column_names):
         super().__init__()
