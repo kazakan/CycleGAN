@@ -35,17 +35,14 @@ class SimpleLogger(BaseLogger):
             content += s
         return content
 
-class ConsoleLogger(BaseLogger):
-    def __init__(self,column_names):
-        super().__init__()
-        self.column_names = column_names
+class ConsoleLogger(SimpleLogger):
+    def __init__(self,column_names,formats = {}):
+        super().__init__(self,column_names,formats)
 
     def write(self, values: dict):
-        content = ""
-        for cname in self.column_names:
-            if cname in values:
-                content += f"{cname} : {values[cname] : .6f} | "
+        content = super().write(values)
         print(content)
+        return content
 
 class CsvLogger(BaseLogger):
     def __init__(self, column_names,csv_path,writemode="w"):
